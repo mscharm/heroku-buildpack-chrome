@@ -47,7 +47,7 @@ done
 topic "Downloading and installing ChromeDriver to ${BUILD_DIR}"
 chromedriver_url="http://chromedriver.storage.googleapis.com/2.9/chromedriver_linux64.zip"
 curl $chromedriver_url -s -o "$BUILD_DIR/.apt/usr/bin/chromedriver.zip"
-unzip "$BUILD_DIR/.apt/usr/bin/chromedriver.zip" -C $BUILD_DIR/.apt/usr/bin
+unzip "$BUILD_DIR/.apt/usr/bin/chromedriver.zip" 
 rm "$BUILD_DIR/.apt/usr/bin/chromedriver.zip"
 
 topic "exporting PATH and LIBRARY_PATH"
