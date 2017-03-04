@@ -45,21 +45,26 @@ for DEB in $(ls -1 $APT_CACHE_DIR/archives/*.deb); do
 done
 
 topic "Downloading and installing ChromeDriver to ${BUILD_DIR}"
-mkdir -p "$BUILD_DIR/vendor/chromedriver/"
-mkdir -p "$BUILD_DIR/vendor/chromedriver/bin"
-export PATH="$BUILD_DIR/vendor/chromedriver/bin":$PATH
-
 chromedriver_url="http://chromedriver.storage.googleapis.com/2.9/chromedriver_linux64.zip"
-curl $chromedriver_url -s -o "$BUILD_DIR/vendor/chromedriver/chromedriver.zip"
-unzip "$BUILD_DIR/vendor/chromedriver/chromedriver.zip"
-rm "$BUILD_DIR/vendor/chromedriver/chromedriver.zip"
-mv "$BUILD_DIR/vendor/chromedriver/chromedriver" "$BUILD_DIR/vendor/chromedriver/bin"
+curl $chromedriver_url -s -o "$BUILD_DIR/.apt/usr/bin/chromedriver.zip"
+unzip "$BUILD_DIR/.apt/usr/bin/chromedriver.zip" -C $BUILD_DIR/.apt/usr/bin
+rm "$BUILD_DIR/.apt/usr/bin/chromedriver.zip"
 
 topic "exporting PATH and LIBRARY_PATH"
 PROFILE_PATH="$BUILD_DIR/.profile.d/chrome.sh"
 mkdir -p $(dirname $PROFILE_PATH)
-echo 'export PATH=".apt/usr/bin:vendor/chromedriver/bin:$PATH"'>> $PROFILE_PATH
+echo 'export PATH=".apt/usr/bin:$PATH"'>> $PROFILE_PATH
 echo 'export LD_LIBRARY_PATH=".apt/usr/lib/x86_64-linux-gnu:.apt/usr/lib:\$LD_LIBRARY_PATH"'>> $PROFILE_PATH
 echo 'export INCLUDE_PATH=".apt/usr/include:\$INCLUDE_PATH"'>> $PROFILE_PATH
 echo 'export CPATH="\$INCLUDE_PATH"'>> $PROFILE_PATH
 echo 'export CPPPATH="\$INCLUDE_PATH"'>> $PROFILE_PATH
+
+topic "Fixing Google Chrome symlinks"
+
+rm -f $BUILD_DIR/.apt/usr/bin/google-chrome
+ln -s /app/.apt/opt/google/chrome/google-chrome $BUILD_DIR/.apt/usr/bin/google-chrome
+
+topic "Patching Xvfb to run in a different path"
+
+ln -s /app/.apt/usr/bin $BUILD_DIR/xub
+sed -i s:/usr/bin:/app/xub: $BUILD_DIR/.apt/usr/bin/Xvfb
